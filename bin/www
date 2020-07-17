@@ -4,16 +4,14 @@
  * Module dependencies.
  */
 
-var appjs = require('../app')
-var app = appjs.app
-var server = appjs.server
-var debug = require('debug')('server:server')
+const { app, server } = require('../app')
+const debug = require('debug')('server:server')
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000')
+const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
 /**
@@ -31,7 +29,7 @@ server.on('listening', onListening)
  */
 
 function normalizePort (val) {
-  var port = parseInt(val, 10)
+  const port = parseInt(val, 10)
 
   if (isNaN(port)) {
     // named pipe
