@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const http = require('http')
 const app = express()
@@ -10,15 +11,7 @@ const loginRouter = require('./routes/login')
 const io = require('socket.io')(server)
 const socketioJWT = require('socketio-jwt')
 
-const mongoose = require('mongoose')
-const User = require('./utils/database')
-
-// Create our specific mongodb instance connection
-mongoose.connect('mongodb://localhost:27017/ChatApp', {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-  useCreateIndex: true
-})
+const db = require('./utils/db')
 
 // add middleware to express server
 app.use(logger('dev'))
@@ -51,26 +44,26 @@ io.on('connection', (socket) => {
   let room
   socket.emit('do login')
 
-  socket.on('login', (username, uuid) => {
+  socket.on('login', (username, uid) => {
     if (addedUser) return
 
     socket.username = username
-    socket.uuid = uuid
+    socket.uid = uid
     addedUser = true
-    User.setSocketID({ username, uuid }, socket.id)
-    User.setOnlineStatus({ username, uuid }, true)
+    db.setSocketID({ username, uid }, socket.id)
+    db.setOnlineStatus({ username, uid }, true)
 
     console.log('\\********************************/')
-    console.log(`Username#uuid: ${socket.username}#${socket.uuid}`)
+    console.log(`Username#uid: ${socket.username}#${socket.uid}`)
     console.log('The current userid is: ' + socket.id)
     console.log('Headers are:')
     console.dir(socket.handshake.headers)
     console.log('/********************************\\')
   })
 
-  socket.on('invite contact', (username, uuid) => {
-    User.userInfo(username, uuid).then((user) => {
-      room = socket.id + username + uuid
+  socket.on('invite contact', (username, uid) => {
+    db.userInfo(username, uid).then((user) => {
+      room = socket.id + username + uid
       socket.join(room)
       socket.to(user.socketid).emit('invited', room)
     })
@@ -100,6 +93,5 @@ io.on('connection', (socket) => {
 
 module.exports = {
   app,
-  server,
-  mongoose
+  server
 }
