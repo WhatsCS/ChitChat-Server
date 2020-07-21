@@ -22,13 +22,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       unique: true,
       get () {
-        let result = this.getDataValue('uid').toString()
-        if (result.length === 4) return result
-        const numZeros = 4 - result.length
-        for (let i = 1; i <= numZeros; i++) {
-          result = '0' + result
+        let result = this.getDataValue('uid')
+        // TODO: figure out why this is throwing an undefined error for `this.getDataValue('uid')
+        try {
+          result = result.toString()
+          if (result.length === 4) return result
+          const numZeros = 4 - result.length
+          for (let i = 1; i <= numZeros; i++) {
+            result = '0' + result
+          }
+        } finally {
+          return result //eslint-disable-line
         }
-        return result
       }
     },
     socketID: {
