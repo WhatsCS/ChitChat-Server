@@ -1,42 +1,40 @@
-const { MongoClient } = require('mongodb')
-const dbUtils = require('../utils/database')
+const dbUtils = require('../utils/db')
+let globalUser = {}
 
-describe('Test database.js functions', () => {
-  let connection
-  let db
-
-  beforeAll(async () => {
-    connection = await MongoClient.connect(global.__MONGO_URI__, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    })
-    db = await connection.db(global.__MONGO_DB_NAME__)
-    // clear the db of any old records before continuing
-    await db.collection('COLLECTION_NAME').deleteMany({})
-
-    const user = db.collection('user')
-    const mockUsers = [{
-      username: 'test1',
-      email: 'test@jointheb.org',
-      password: 'test',
-      uuid: '1234'
-    },
-    {
-      username: 'test2',
-      email: 'example@jointheb.org',
-      password: 'test',
-      uuid: '1235'
-    }]
-    await user.insertMany(mockUsers)
+describe('Testing database.js functions', () => {
+  it('firstly creates a new user', async () => {
+    const nuser = {
+      username: 'test_user1',
+      email: '1@jointheb.org',
+      password: 'test'
+    }
+    const usr = await dbUtils.createUser(nuser)
+    globalUser = usr
+    console.dir(globalUser)
+    return expect(usr).toEqual(expect.objectContaining({ username: nuser.username, email: nuser.email }))
   })
-
-  afterAll(async () => {
-    await connection.close()
-    await db.close()
+  it('gets info on a user via username only', async () => {
+    const lookup = await dbUtils.userInfo('test_user1')
+    if (typeof lookup === 'object') {
+      return expect(lookup).toEqual(expect.objectContaining({ username: 'test_user1', uid: expect.any(String) }))
+    }
   })
-
   it('gets info on user via email only', async () => {
-    const user = await dbUtils.userInfoEmail('test@jointheb.org')
-    expect(user).toMatchObject([{ _id: expect.anything(), username: 'test1', uuid: '1234' }])
+    const lookup = await dbUtils.userInfoEmail('1@jointheb.org')
+    return expect(lookup).toEqual(expect.objectContaining({ username: 'test_user1', uid: expect.any(String) }))
+  })
+  it('checks the users password hashing', async () => {
+    const checks = await dbUtils.checkUserPassword({ email: globalUser.email, password: 'test' })
+    return expect(checks).toBe(true)
+  })
+  it('updates user socketID', async () => {
+    // we need to find the user for uid lol
+    const updated = await dbUtils.setSocketID({ username: globalUser.username, uid: globalUser.uid }, 'asd125-dfsah5-gfds-g523')
+    return expect(updated).toEqual([1])
+  })
+  it('updates user status', async () => {
+    // we need to find the user for uid lol
+    const updated = await dbUtils.setOnlineStatus({ username: globalUser.username, uid: globalUser.uid }, 'online')
+    return expect(updated).toEqual([1])
   })
 })
