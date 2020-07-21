@@ -13,9 +13,13 @@ module.exports = {
     '/node_modules/'
   ],
 
-  // The test environment that will be used for testing
-  // testEnvironment: "node",
+  setupFilesAfterEnv: [
+    './scripts/testSuiteSetup.js'
+  ],
 
-  // Presets
-  preset: '@shelf/jest-mongodb'
+  // The test environment that will be used for testing
+  testEnvironment: 'node',
+
+  // Timeout setting
+  testTimeout: 30000
 }
