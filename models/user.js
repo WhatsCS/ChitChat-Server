@@ -19,22 +19,8 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     uid: {
-      type: DataTypes.INTEGER,
-      unique: true,
-      get () {
-        let result = this.getDataValue('uid')
-        // TODO: figure out why this is throwing an undefined error for `this.getDataValue('uid')
-        try {
-          result = result.toString()
-          if (result.length === 4) return result
-          const numZeros = 4 - result.length
-          for (let i = 1; i <= numZeros; i++) {
-            result = '0' + result
-          }
-        } finally {
-          return result //eslint-disable-line
-        }
-      }
+      type: DataTypes.STRING(4),
+      unique: true
     },
     socketID: {
       type: DataTypes.STRING,
