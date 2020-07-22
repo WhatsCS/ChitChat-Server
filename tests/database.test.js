@@ -10,7 +10,6 @@ describe('Testing database.js functions', () => {
     }
     const usr = await dbUtils.createUser(nuser)
     globalUser = usr
-    console.dir(globalUser)
     return expect(usr).toEqual(expect.objectContaining({ username: nuser.username, email: nuser.email }))
   })
   it('gets info on a user via username only', async () => {
@@ -28,12 +27,12 @@ describe('Testing database.js functions', () => {
     return expect(checks).toBe(true)
   })
   it('updates user socketID', async () => {
-    // we need to find the user for uid lol
+    // we need to find the user for uid
     const updated = await dbUtils.setSocketID({ username: globalUser.username, uid: globalUser.uid }, 'asd125-dfsah5-gfds-g523')
     return expect(updated).toEqual([1])
   })
   it('updates user status', async () => {
-    // we need to find the user for uid lol
+    // we need to find the user for uid
     const updated = await dbUtils.setOnlineStatus({ username: globalUser.username, uid: globalUser.uid }, 'online')
     return expect(updated).toEqual([1])
   })
