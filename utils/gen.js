@@ -13,9 +13,13 @@ exports.modelToJSON = (model) => {
     const ret = model[0].toJSON()
     return ret
   }
-  const usrList = []
-  for (const ele of model) {
-    usrList.push(ele.toJSON())
+  try {
+    const usrList = []
+    for (const ele of model) {
+      usrList.push(ele.toJSON())
+    }
+    return usrList
+  } catch {
+    return model.toJSON()
   }
-  return usrList
 }
