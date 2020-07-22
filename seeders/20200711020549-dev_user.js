@@ -5,7 +5,7 @@ module.exports = {
       username: 'dev_user',
       email: 'dev@jointheb.org',
       password: 'test password',
-      uid: 1234
+      uid: '1234'
     })
   },
 

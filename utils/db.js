@@ -53,7 +53,7 @@ async function userInfo (username, uid) {
  * @async
  * @desc given an email, this async function will fetch the user. Mainly used internally.
  * @param {string} email
- * @returns {Promise<T>}
+ * @returns {object}
  */
 async function userInfoEmail (email) {
   const usrQuery = await User.findAll({ attributes: ['username', 'uid'], where: { email: email } })
@@ -63,28 +63,44 @@ async function userInfoEmail (email) {
 
 /**
  * @desc given the user object and a response object, it will attempt to create the user and then tell the client if it was successful or not
- * @param {object} newUserObj - object containing username, email, hashed password, uid.
- * @param {express.Response} response
- * @returns {express.Response} response
+ * @param {object} newUserObj - object containing username, email, password
+ * @returns {object}
  */
-async function createUser (newUserObj, response) {
+async function createUser (newUserObj) {
   const min = Math.ceil(1)
   const max = Math.floor(9999)
   let uid = Math.floor(Math.random() * (max - min + 1)) + min
-  const exists = await usernameExists(newUserObj.username)
-  if (exists) {
-    for (let i = 0; i > exists.length; i++) {
-      if (uid === exists[i].uid) {
-        uid = Math.floor(Math.random() * (max - min + 1)) + min
-        i = 0
+  try {
+    const exists = await usernameExists(newUserObj.username)
+    if (exists) {
+      for (let i = 0; i > exists.length; i++) {
+        if (uid === exists[i].uid) {
+          uid = Math.floor(Math.random() * (max - min + 1)) + min
+          i = 0
+        }
       }
+    }
+  } catch (err) {
+    console.error(err)
+    return false
+  }
+
+  uid = uid.toString()
+  if (uid.length < 4) {
+    const zreq = 4 - uid.length
+    for (let i = 0; i < zreq; i++) {
+      uid = '0' + uid
     }
   }
 
   newUserObj.uid = uid
-  let result = await User.create(newUserObj)
-  result = result.dataValues
-  return result
+  try {
+    const result = await User.create(newUserObj)
+    return modelToJSON(result)
+  } catch (err) {
+    console.log(err)
+    return false
+  }
 }
 
 /**

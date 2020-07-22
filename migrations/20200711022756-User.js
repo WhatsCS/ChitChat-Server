@@ -18,7 +18,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       uid: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(4),
         unique: true
       },
       socketID: {
