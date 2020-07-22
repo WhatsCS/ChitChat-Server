@@ -6,11 +6,12 @@ module.exports = {
     host: '127.0.0.1',
     dialect: 'postgres'
   },
+  // ENV variables are for GitHub Actions
   test: {
-    username: 'Dev',
-    password: 'test pass',
-    database: 'ChitChat_test',
-    host: '127.0.0.1',
+    username: process.env.POSTGRES_USER || 'Dev',
+    password: process.env.POSTGRES_PASSWORD || 'test pass',
+    database: process.env.POSTGRES_DB || 'ChitChat_test',
+    host: process.env.POSTGRES_HOST || '127.0.0.1',
     dialect: 'postgres'
   },
   production: {
